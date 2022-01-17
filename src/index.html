@@ -7,31 +7,37 @@
     <title>Homework 11</title>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css"
+      integrity="sha512-ISS7cAi1PEhQ8jnbJpJZMd29NlhNj4AWYyLOSp2CE/CsHxTCu+r+t0D2yoJudVrd0/8fTVPUVDzY5Tvli75u/g=="
+      crossorigin="anonymous"
     />
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
     <header class="page-header">
-      <form class="search-form" id="search-form">
-        <div class="search-wrap">
-          <input
-            class="search-input"
-            type="text"
-            name="searchQuery"
-            autocomplete="off"
-            placeholder="Search images..."
-          />
-          <button class="search-btn" type="submit">
-            <img src="./img/search.png" width="16" height="16" alt="seach" />
-          </button>
-        </div>
-      </form>
+      <div class="container">
+        <form class="search-form" id="search-form">
+          <div class="search-wrap">
+            <input
+              class="search-input"
+              type="text"
+              name="searchQuery"
+              autocomplete="off"
+              placeholder="Search images..."
+            />
+            <button class="search-btn" type="submit">
+              <img src="./img/search.png" width="16" height="16" alt="seach" />
+            </button>
+          </div>
+        </form>
+      </div>
     </header>
 
-    <div class="gallery-wrap">
+    <div class="container">
       <div class="gallery"></div>
+      <button type="button" class="load-more visually-hidden">Load more</button>
     </div>
+
     <script src="index.js"></script>
   </body>
 </html>
