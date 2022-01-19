@@ -33,7 +33,3 @@ function incrementPage() {
 function resetPage() {
   page = 1;
 }
-
-function getPage() {
-  console.log(page);
-}

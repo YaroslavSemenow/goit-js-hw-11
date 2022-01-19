@@ -23,7 +23,6 @@ function OnSubmitForm(e) {
 
   fetchImages(searchQuery)
     .then(res => {
-      Notify.success(`Hooray! We found ${res.totalHits} images.`);
       galleryEl.innerHTML = '';
 
       const arrImg = res.hits;
@@ -36,7 +35,9 @@ function OnSubmitForm(e) {
 
       renderCard(arrImg);
       runSimpleLightBox();
+      refreshSimpleLightBox();
       loadMoreBtn.classList.remove('visually-hidden');
+      Notify.success(`Hooray! We found ${res.totalHits} images.`);
     })
     .catch(error => console.log(error));
 }
