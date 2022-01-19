@@ -38,6 +38,7 @@ function OnSubmitForm(e) {
       refreshSimpleLightBox();
       loadMoreBtn.classList.remove('visually-hidden');
       Notify.success(`Hooray! We found ${res.totalHits} images.`);
+      scrollToTopPage();
     })
     .catch(error => console.log(error));
 }
@@ -90,6 +91,7 @@ function fetchNextPage() {
 
       renderCard(res.hits);
       refreshSimpleLightBox();
+      scrollToNextPage();
     })
     .catch(error => console.log(error));
 }
@@ -103,4 +105,23 @@ function runSimpleLightBox() {
 
 function refreshSimpleLightBox() {
   gallery.refresh();
+}
+
+function scrollToNextPage() {
+  setTimeout(() => {
+    const { height: cardHeight } = galleryEl.firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+  }, 200);
+}
+
+function scrollToTopPage() {
+  setTimeout(() => {
+    galleryEl.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }, 100);
 }
