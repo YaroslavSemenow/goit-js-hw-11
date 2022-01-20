@@ -20,27 +20,50 @@ function OnSubmitForm(e) {
 
   setQuery(searchQuery);
   resetPage();
+  fetchNewImages(searchQuery);
+}
 
-  fetchImages(searchQuery)
-    .then(res => {
-      galleryEl.innerHTML = '';
+async function fetchNewImages(searchQuery) {
+  try {
+    const imagesObj = await fetchImages(searchQuery);
+    const arrImg = imagesObj.hits;
+    galleryEl.innerHTML = '';
 
-      const arrImg = res.hits;
+    if (arrImg.length === 0) {
+      return Notify.failure(
+        '"Sorry, there are no images matching your search query. Please try again."',
+      );
+    }
 
-      if (arrImg.length === 0) {
-        return Notify.failure(
-          '"Sorry, there are no images matching your search query. Please try again."',
-        );
-      }
+    renderCard(arrImg);
+    runSimpleLightBox();
+    refreshSimpleLightBox();
+    loadMoreBtn.classList.remove('visually-hidden');
+    Notify.success(`Hooray! We found ${imagesObj.totalHits} images.`);
+    scrollToTopPage();
+  } catch (error) {
+    console.log(error);
+  }
+}
 
-      renderCard(arrImg);
-      runSimpleLightBox();
-      refreshSimpleLightBox();
-      loadMoreBtn.classList.remove('visually-hidden');
-      Notify.success(`Hooray! We found ${res.totalHits} images.`);
-      scrollToTopPage();
-    })
-    .catch(error => console.log(error));
+async function fetchNextPage() {
+  try {
+    incrementPage();
+
+    const searchQuery = getQuery();
+    const imagesObj = await fetchImages(searchQuery);
+
+    const arrImg = imagesObj.hits;
+    if (arrImg.length === 0) {
+      return Notify.info("We're sorry, but you've reached the end of search results.");
+    }
+
+    renderCard(arrImg);
+    refreshSimpleLightBox();
+    scrollToNextPage();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function renderCard(arrImg) {
@@ -75,25 +98,6 @@ function renderCard(arrImg) {
     .join('');
 
   galleryEl.insertAdjacentHTML('beforeend', markup);
-}
-
-function fetchNextPage() {
-  incrementPage();
-
-  const searchQuery = getQuery();
-
-  fetchImages(searchQuery)
-    .then(res => {
-      const arrImg = res.hits;
-      if (arrImg.length === 0) {
-        return Notify.info("We're sorry, but you've reached the end of search results.");
-      }
-
-      renderCard(res.hits);
-      refreshSimpleLightBox();
-      scrollToNextPage();
-    })
-    .catch(error => console.log(error));
 }
 
 function runSimpleLightBox() {

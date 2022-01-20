@@ -79,8 +79,7 @@ img {
   transition: background-color linear 250ms;
 }
 
-.search-btn:hover,
-.search-btn:focus {
+.search-btn:hover {
   background-color: rgba(61, 59, 59, 0.301);
 }
 
