@@ -10,7 +10,7 @@ const loadMoreBtn = document.querySelector('.load-more');
 let gallery = new SimpleLightbox('.gallery a');
 
 form.addEventListener('submit', OnSubmitForm);
-loadMoreBtn.addEventListener('click', fetchNextPage);
+loadMoreBtn.addEventListener('click', OnLoadMoreBtnClick);
 
 function OnSubmitForm(e) {
   e.preventDefault();
@@ -18,49 +18,56 @@ function OnSubmitForm(e) {
 
   const searchQuery = e.currentTarget.elements.searchQuery.value;
 
-  imagesAPIService.setQuery(searchQuery);
-  imagesAPIService.resetPage();
-  fetchNewImages(searchQuery);
+  fetchImages(searchQuery);
 }
 
-async function fetchNewImages() {
-  try {
-    const imagesObj = await imagesAPIService.fetchImages();
-    const arrImg = imagesObj.hits;
-    galleryEl.innerHTML = '';
-
-    if (arrImg.length === 0) {
-      return Notify.failure(
-        '"Sorry, there are no images matching your search query. Please try again."',
-      );
-    }
-
-    renderCard(arrImg);
-    runSimpleLightBox();
-    refreshSimpleLightBox();
-    loadMoreBtn.classList.remove('visually-hidden');
-    Notify.success(`Hooray! We found ${imagesObj.totalHits} images.`);
-    scrollToTopPage();
-  } catch (error) {
-    console.log(error);
-  }
+function OnLoadMoreBtnClick() {
+  const seachQuery = imagesAPIService.getQuery();
+  fetchImages(seachQuery);
 }
 
-async function fetchNextPage() {
+async function fetchImages(searchQuery) {
   try {
-    imagesAPIService.incrementPage();
+    const savedsearchQuery = imagesAPIService.getQuery();
 
-    const searchQuery = imagesAPIService.getQuery();
-    const imagesObj = await imagesAPIService.fetchImages(searchQuery);
+    if (savedsearchQuery !== searchQuery) {
+      galleryEl.innerHTML = '';
+      imagesAPIService.setQuery(searchQuery);
+      imagesAPIService.resetPage();
 
-    const arrImg = imagesObj.hits;
-    if (arrImg.length === 0) {
-      return Notify.info("We're sorry, but you've reached the end of search results.");
+      const imagesObj = await imagesAPIService.fetchImages();
+      const arrImg = imagesObj.hits;
+      const totalImg = imagesObj.totalHits;
+
+      if (arrImg.length === 0) {
+        return Notify.failure(
+          '"Sorry, there are no images matching your search query. Please try again."',
+        );
+      }
+
+      if (totalImg > imagesAPIService.PER_PAGE) {
+        loadMoreBtn.classList.remove('visually-hidden');
+      }
+
+      renderCard(arrImg);
+      runSimpleLightBox();
+      Notify.success(`Hooray! We found ${totalImg} images.`);
+      scrollToTopPage();
+    } else {
+      imagesAPIService.incrementPage();
+
+      const imagesObj = await imagesAPIService.fetchImages();
+      const arrImg = imagesObj.hits;
+
+      if (arrImg.length === 0) {
+        return Notify.info("We're sorry, but you've reached the end of search results.");
+      }
+
+      renderCard(arrImg);
+      scrollToNextPage();
     }
 
-    renderCard(arrImg);
-    refreshSimpleLightBox();
-    scrollToNextPage();
+    gallery.refresh();
   } catch (error) {
     console.log(error);
   }
@@ -107,10 +114,6 @@ function runSimpleLightBox() {
   });
 }
 
-function refreshSimpleLightBox() {
-  gallery.refresh();
-}
-
 function scrollToNextPage() {
   setTimeout(() => {
     const { height: cardHeight } = galleryEl.firstElementChild.getBoundingClientRect();
@@ -128,27 +131,4 @@ function scrollToTopPage() {
       behavior: 'smooth',
     });
   }, 100);
-}
-
-async function fetchNImages() {
-  try {
-    const imagesObj = await imagesAPIService.fetchImages();
-    const arrImg = imagesObj.hits;
-    galleryEl.innerHTML = '';
-
-    if (arrImg.length === 0) {
-      return Notify.failure(
-        '"Sorry, there are no images matching your search query. Please try again."',
-      );
-    }
-
-    renderCard(arrImg);
-    runSimpleLightBox();
-    refreshSimpleLightBox();
-    loadMoreBtn.classList.remove('visually-hidden');
-    Notify.success(`Hooray! We found ${imagesObj.totalHits} images.`);
-    scrollToTopPage();
-  } catch (error) {
-    console.log(error);
-  }
 }
