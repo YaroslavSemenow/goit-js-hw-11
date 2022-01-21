@@ -1,4 +1,4 @@
-import { fetchImages, incrementPage, setQuery, resetPage, getQuery } from './fetchImages';
+import { imagesAPIService } from './images_api_service';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -18,14 +18,14 @@ function OnSubmitForm(e) {
 
   const searchQuery = e.currentTarget.elements.searchQuery.value;
 
-  setQuery(searchQuery);
-  resetPage();
+  imagesAPIService.setQuery(searchQuery);
+  imagesAPIService.resetPage();
   fetchNewImages(searchQuery);
 }
 
-async function fetchNewImages(searchQuery) {
+async function fetchNewImages() {
   try {
-    const imagesObj = await fetchImages(searchQuery);
+    const imagesObj = await imagesAPIService.fetchImages();
     const arrImg = imagesObj.hits;
     galleryEl.innerHTML = '';
 
@@ -48,10 +48,10 @@ async function fetchNewImages(searchQuery) {
 
 async function fetchNextPage() {
   try {
-    incrementPage();
+    imagesAPIService.incrementPage();
 
-    const searchQuery = getQuery();
-    const imagesObj = await fetchImages(searchQuery);
+    const searchQuery = imagesAPIService.getQuery();
+    const imagesObj = await imagesAPIService.fetchImages(searchQuery);
 
     const arrImg = imagesObj.hits;
     if (arrImg.length === 0) {
@@ -128,4 +128,27 @@ function scrollToTopPage() {
       behavior: 'smooth',
     });
   }, 100);
+}
+
+async function fetchNImages() {
+  try {
+    const imagesObj = await imagesAPIService.fetchImages();
+    const arrImg = imagesObj.hits;
+    galleryEl.innerHTML = '';
+
+    if (arrImg.length === 0) {
+      return Notify.failure(
+        '"Sorry, there are no images matching your search query. Please try again."',
+      );
+    }
+
+    renderCard(arrImg);
+    runSimpleLightBox();
+    refreshSimpleLightBox();
+    loadMoreBtn.classList.remove('visually-hidden');
+    Notify.success(`Hooray! We found ${imagesObj.totalHits} images.`);
+    scrollToTopPage();
+  } catch (error) {
+    console.log(error);
+  }
 }
